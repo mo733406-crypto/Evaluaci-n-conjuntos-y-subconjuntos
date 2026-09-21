@@ -1,0 +1,57 @@
+name: Compilar Lumi para Android
+
+on:
+  workflow_dispatch:
+
+jobs:
+  compilar-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar proyecto
+        uses: actions/checkout@v4
+
+      - name: Instalar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Preparar proyecto Android
+        run: |
+          npm init -y
+          npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7
+
+          mkdir -p www
+          cp index.html www/index.html
+
+          cat > capacitor.config.json <<'EOF'
+          {
+            "appId": "com.edufusion.lumi",
+            "appName": "Lumi Conjuntos",
+            "webDir": "www"
+          }
+          EOF
+
+          npx cap add android
+          npx cap sync android
+
+      - name: Compilar APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Publicar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lumi-Android-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk

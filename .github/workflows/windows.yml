@@ -1,0 +1,48 @@
+name: Compilar Lumi para Windows
+
+on:
+  workflow_dispatch:
+
+jobs:
+  compilar:
+    runs-on: windows-latest
+
+    steps:
+      - name: Descargar proyecto
+        uses: actions/checkout@v4
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependencias
+        run: pip install pyinstaller pywebview
+
+      - name: Crear aplicacion
+        shell: pwsh
+        run: |
+          @'
+          import os
+          import sys
+          import webview
+
+          base = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
+          ruta = os.path.join(base, "index.html")
+
+          webview.create_window(
+              "Lumi - Evaluacion de conjuntos",
+              ruta,
+              width=1100,
+              height=800
+          )
+          webview.start()
+          '@ | Set-Content -Path lumi.py -Encoding UTF8
+
+          pyinstaller --noconfirm --onefile --windowed --add-data "index.html;." --name Lumi_Conjuntos lumi.py
+
+      - name: Publicar ejecutable
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lumi-Windows
+          path: dist/Lumi_Conjuntos.exe

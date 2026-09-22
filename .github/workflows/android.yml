@@ -1,5 +1,5 @@
-name: Compilar Lumi para Android
-
+- name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
 on:
   workflow_dispatch:
 

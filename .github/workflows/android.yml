@@ -11,8 +11,8 @@ jobs:
       - name: Descargar proyecto
         uses: actions/checkout@v4
 
-      - - name: Configurar Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Instalar Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
@@ -21,9 +21,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-
-      - name: Configurar Android SDK
-        uses: android-actions/setup-android@v3
 
       - name: Preparar proyecto Android
         run: |
